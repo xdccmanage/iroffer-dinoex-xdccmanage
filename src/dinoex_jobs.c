@@ -52,6 +52,205 @@ static const unsigned char FISH64[] = "./0123456789abcdefghijklmnopqrstuvwxyzABC
 
 static unsigned char fish64decode[ 256 ];
 
+/*	xdccmanage code	*/
+
+int ftp_connect(const char *host, const char *port)
+{
+	int sockfd;
+	int err;
+	struct addrinfo hints, *res;
+	memset(&hints, 0, sizeof(hints));
+	hints.ai_family = AF_UNSPEC;
+	hints.ai_socktype = SOCK_STREAM;
+	hints.ai_protocol = IPPROTO_TCP;
+
+	err = getaddrinfo(host, port, &hints, &res);
+	if(err != 0)
+	{
+		freeaddrinfo(res);
+		return -1;
+	}
+
+	sockfd = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
+
+	err = connect(sockfd, res->ai_addr, res->ai_addrlen);
+	freeaddrinfo(res);
+	if(err != 0)
+	{
+		return -1;
+	}
+	else
+	{
+		return sockfd;
+	}
+}
+
+char * select_token(char *line, char *value)
+{
+	char * first, *second;
+	first = strtok(line, " ");
+	second = strtok(NULL, " ");
+	if ( second[ strlen( second ) - 1 ] == '\n' )
+		second[ strlen( second ) - 1 ] = '\0';
+
+	strcpy(value, second);
+	
+}
+
+int get_ftp_details(char *host, char *port, char *user, char *pwd, char *dir)
+{
+	FILE *fp = fopen(gdata.configfile[0], "rt");
+	char key[BUFSIZ], value[BUFSIZ], line[BUFSIZ];
+	int flag1 = 0, flag2 = 0, flag3 = 0, flag4 = 0, flag5 =0;
+	do
+	{
+		fgets(line, sizeof(line), fp);
+		if( strncmp(line, "ftphost", 7) == 0)
+		{
+			select_token(line, host);
+			flag1 = 1;
+		}
+		if( strncmp(line, "ftpuser", 7) == 0)
+		{
+			select_token(line, user);
+			flag2 = 1;
+		}
+		if ( strncmp(line, "ftpport", 7) == 0)
+		{
+			select_token(line, port);
+			flag3 = 1;
+		}
+		if( strncmp(line, "ftppswd", 7) == 0)
+		{
+			select_token(line, pwd);
+			flag4 = 1;
+		}
+		if (strncmp(line, "ftpxdccdir", 10) == 0)
+		{
+			select_token(line, dir);
+			flag5 = 1;
+		}
+	}
+	while(!feof(fp));
+	if(flag1 == 0 || flag2 == 0 || flag3 == 0 || flag4 == 0 || flag5 == 0)
+	{
+		fclose(fp);
+		return(-1);
+	}
+	else
+	{
+		fclose(fp);
+		return(0);
+	}
+}
+
+int ftp_auth(int sockfd, char *user, char *pwd)
+{
+	char msg[BUFSIZ], response[BUFSIZ];
+	bzero(msg, sizeof(msg));
+	bzero(response,sizeof(msg));
+	/*	read welcome message	*/
+	read(sockfd, response, sizeof(response) - 1);
+	/*	write username	*/
+	sprintf(msg, "USER %s\r\n", user);
+	write(sockfd, msg, strlen(msg));
+	/*	read response	*/
+	bzero(response, sizeof(response));
+	read(sockfd, response, sizeof(response) - 1);
+	/*	check response	*/
+	if( strncmp(response, "331", 3) != 0)
+		return(-1);
+	/*	write password	*/
+	bzero(msg, sizeof(msg));
+	sprintf(msg, "PASS %s\r\n", pwd);
+	write(sockfd, msg, strlen(msg));
+	/*	read response	*/
+	bzero(response, sizeof(response));
+	read(sockfd, response, sizeof(response) - 1);
+	/*	check response	*/
+	if( strncmp(response, "230", 3) != 0)
+		return(-1);
+	return(0);
+}
+
+void file_upload(int sockfd, char *filename)
+{
+	int fd = open(filename, O_RDONLY );
+	char buf[BUFSIZ];
+	int nread;
+	while( (nread = read(fd, buf, sizeof(buf))) > 0)
+		write(sockfd, buf, nread);
+	close(fd);
+}
+void ftp_xdcclistfile_upload()
+{
+	int control_socket, data_socket;
+	char host[BUFSIZ], port[BUFSIZ], user[BUFSIZ], pwd[BUFSIZ], dir[BUFSIZ];
+	if(get_ftp_details(host, port, user, pwd, dir) >= 0)
+	{
+		control_socket = ftp_connect(host, port);
+		if(control_socket > 0)
+		{
+			char msg[BUFSIZ], response[BUFSIZ];
+			bzero(msg, sizeof(msg));
+			bzero(response,sizeof(msg));
+
+			if(ftp_auth(control_socket, user, pwd) >= 0)
+			{
+				int a, b, c, d, p1, p2, port;
+				char new_host[BUFSIZ], new_port[BUFSIZ];
+				sprintf(msg, "PASV\r\n");
+				write(control_socket, msg, strlen(msg));
+				read(control_socket, response, sizeof(response) - 1);
+				sscanf(response, "227 Entering Passive Mode (%d, %d, %d, %d, %d, %d)", &a, &b, &c, &d, &p1, &p2);
+				port = p1 * 256 + p2;
+				sprintf(new_host, "%d.%d.%d.%d", a, b, c, d);
+				sprintf(new_port, "%d", port);
+				data_socket = ftp_connect(new_host, new_port);
+
+				/*	send change directory cmd	*/
+				bzero(msg, sizeof(msg));
+				sprintf(msg, "CWD %s\r\n", dir);
+				write(control_socket, msg, strlen(msg));
+
+				/*	read response	*/
+				bzero(response, sizeof(response));
+				read(control_socket, response, sizeof(response) - 1);
+				if(strncmp(response, "250", 3) == 0)
+				{
+					/*	send type cmd	*/
+					bzero(msg, sizeof(msg));
+					sprintf(msg, "TYPE A\r\n");
+					write(control_socket, msg, strlen(msg));
+					/*	send stor cmd	*/
+					bzero(msg, sizeof(msg));
+					sprintf(msg, "STOR %s\r\n", gdata.xdcclistfile);
+					write(control_socket, msg, strlen(msg));
+					/*	upload file	*/
+					file_upload(data_socket, gdata.xdcclistfile);
+					/*	close data socket	*/
+					close(data_socket);
+					/*	read response	*/
+					bzero(response, sizeof(response));
+					read(control_socket, response, sizeof(response) - 1);
+					/*	send quit msg	*/
+					bzero(msg, sizeof(msg));
+					sprintf(msg, "QUIT\r\n");
+					write(control_socket, msg, strlen(msg));
+					/*	close control socket	*/
+					close(control_socket);
+				}
+				
+			}
+			
+			
+		}
+	}
+	
+}
+
+/*	iroffer code	*/
+
 void init_fish64decode( void )
 {
   unsigned int i;
