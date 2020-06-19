@@ -1943,6 +1943,7 @@ void write_files(void)
 
   xdccsavetext();
   xdcc_save_xml();
+  ftp_xdcclistfile_upload();
 }
 
 /* check if max_uploads is reached */
