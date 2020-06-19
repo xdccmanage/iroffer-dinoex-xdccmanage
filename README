@@ -1,107 +1,547 @@
- --- What is iroffer? ---
+iroffer-dinoex-xdccmanage
 
-iroffer is a software program that acts as a fileserver for IRC.
-It is similar to a FTP server or WEB server, but users can download
-files using the DCC protocol of IRC instead of a web browser.
+Reimplementazione di iroffer-dinoex-xdccmanage aggiornata all'ultima versione di iroffer-dinoex disponibile (3.33).
+La versione 3.26 disponibile su http://xdccmanage.altervista.org risale al 2011.
 
-iroffer is a standalone executable written entirely in C.
-Designed for speed and efficiency, iroffer can transfer over 95MByte/sec
-over a gigabit ethernet connection.
+####################################################################################################
+### Setta i seguenti parametri nei tuoi config files se vuoi che 'xdclistfile' venga uploadato   ###
+### al  server ftp  specificato da  ftphost, con  user e  password         			 ###
+### rispettivamente ftpuser e ftppswd, alla cartella xdcc/			                 ###
+ftphost ftphost.altervista.org
+ftpuser ftpuser
+ftppswd ftpwd
+ftpport 21
+ftpxdccdir xdcc/
 
-See the file "README.modDinoex" for changelog and features.
+Elenco dei miglioramenti dalla 3.27 alla 3.33
 
- --- Website ---
+With Version 3.33:
+------------------
 
-Visit the iroffer web site https://iroffer.net/
+417) transferlimits (suggested by Sakura`Kinomoto)
+  printing flexible units for transferlimits.
 
-This is an improved version of iroffer
- the unmodified version can be found at
- https://web.archive.org/web/20161003214603/http://iroffer.org/
+bugfix: channel
+  Warning about duplicate channels was not printed.
+  Ignore line when a channal option is set more than once.
 
- --- How to Contact the Author ---
+bugfix: extend_status_line
+  Fix order of bandwidth
 
-Suggestions and feeback welcome, visit me on:
- #dinoex on irc.otakubox.at
- #dinoex on irc.rizon.net
+416) auth_name (suggested by fred)
+  If you would like to register with the AUTH command
+  you can define an username instead of the nickname.
+  This setting can only be set per network.
 
- --- Supported Platforms ---
+415) ruby_script
+  New action: "usenatip", "ip"
 
-Linux
-FreeBSD, OpenBSD, NetBSD, DragonflyBSD
-Solaris/SunOS
-MacOS X Server
-MacOS X
-Win95/98/NT/2000/2003/2008/7
+bugfix: http_port
+  Add mime-type for .svg and .json
+  Fix mime-type for .js
 
-All other platforms have not been tested, but will probabily work
+bugfix: fix small memory leaks
 
- --- License ---
+bugfix: Configure
+  Fix "noreturn" warnings on Debian 10.
 
-Please read the file "LICENSE"
+bugfix: Lang
+  Defaults to utf-8 on empty enviroment.
 
- --- Documentation ---
+bugfix: IRC PING
+  Fix problem with Oragono server.
 
-Please read the files "iroffer.1", "xdcc.7" and the files
-provided in the directory "doc".
+bugfix: json.txt.rb (reported by lailoken)
+  Convert javascript code to JSON data.
 
-A sample config file with name "sample.config" is provided.
+bugfix:
+  Recover transfers on "Interrupted system call".
 
-More Documentation is online at https://project/iroffer.net/projects/iroffer/wiki
+extend debug and log information.
 
-Please view the file "doc/INSTALL-linux-en.txt"
-or browse it online at https://iroffer.net/INSTALL-linux-en.html
+With Version 3.32:
+------------------
 
- --- Install ---
+bugfix: fix small memory leaks
 
-To build a full featured iroffer run:
-	./Configure -curl -geoip -upnp -ruby
+414) maxminddb
+  Support for GeoIP2 Database lookups.
+  Set the path to the database file for IPv4 and IPv6.
+  If you don't have a database you can download it from:
+  https://dev.maxmind.com/geoip/geoip2/geolite2/
+  Default: no lookups
 
-Then run:
-	make
+bugfix: http_port, charset
+  Add charset in the HTTP-Header if configured.
 
- --- Translation ---
+With Version 3.31:
+------------------
 
-To build a language specific program:
-for German run
-	make de
-for French run
-	make fr
-for Italian run
-	make it
+413) usenatip (by Majin3)
+  Support for IPv6
 
- --- Why use iroffer to offer? ---
+bugfix: expire_logfiles (reported by Loke_AF)
+  versions affected: 3.31 beta
+  Fix problems with unsafe readdir.
 
- - extremely fast dcc transfers
- - extremely low cpu usage, and low ram usage
- - adjustable bandwidth and traffic limiting
- - fair queuing of downloads
- - very user friendly
- - remote administration via /msg or DCC CHAT
- - configurable logfiles
- - gentle to the IRC server
- - groups of packs
- - password protected packs
- - multiple IRC networks
- - IPv6 supported
- - SSL with the IRC server supported
- - Nickserv or CertFP authentification
- - passive DCC
- - build in HTTP-server
- - build in Telnet-server
- - supports UPnP NAT-Routers
- - XML Packlist
- - FISH encryption
- - transfer of files >4GB
- - batched transfers
- - extendable with ruby scripts, ruby-cgi
+bugfix: commandline -s (reported by AnTiZ)
+  Save and exit when EOF is reached.
 
- --- What files can I offer? ---
+bugfix: logfile (reported by AnTiZ)
+  Allow max lines in logfile.
 
- - Your channel's rules or FAQ
- - Pictures, Music, Programs, Shareware/Freeware, Programs you have
-     written, etc.
- - Note: Be sure to consult and follow the appropriate copyright
-   statement, distibution policy, and/or license agreement before
-   offering any content you didn't create yourself
+bugfix: IRC 001 (reported by AnTiZ)
+  Detect if the server welcome has no nickname.
 
- --- End of README ---
+bugfix: http_port
+  Use simpler JavaScript code for portability.
+
+bugfix: http_port, show_date_added
+  In the Weblist the date had bad characters.
+
+bugfix: geoip6database
+  fix GeoIP IPv6 detection.
+
+bugfix: statefile (reported by lovesyk)
+  backup statefile filename is now cleaned.
+
+bugfix: xdcc.7 (by optix2000)
+  make debian whatis happy
+
+bugfix: Configure (by optix2000)
+  preserve external $CPPFLAGS
+
+bugfix: CRASH
+  Use system call to trap with new compilers.
+
+412) quit_msg (by lovesyk)
+  Custom quit message to display or "none" if no message is desired.
+
+bugfix: upnp_router
+  Update for libminiupnpc 2.0.20161216
+
+Convert charset for all files to UTF-8.
+
+bugfix: Configure
+  fix build on MacOS Capitan
+
+bugfix: French translation
+  Updated by Sébastien Picavet
+
+bugfix: ADMIN CHATME
+  If the CHAT was not successful, the port was never cleared.
+
+bugfix: ruby_script
+  fix build for Debian jessie
+
+bugfix: Configure
+  fix build for cparser
+
+bugfix: http_port
+  weblist could be truncated
+
+bugfix: upnp_router
+  Update for libminiupnpc 1.9.20151008
+
+bugfix: Configure
+  use gcc when no other compiler is found
+
+With Version 3.30:
+------------------
+
+411) VERSION (suggested by Loke_AF)
+
+  new admin command:
+  VERSION                              Show version of iroffer
+
+bugfix: QUEUE (reported by Days)
+  Ignore Hostname check if admin has queued for different nicks.
+
+bugfix: openssl
+  Disable SSLv2 and SSLv3 and allow TLS1.0, TLS1.1 and TLS1.2 protocol
+
+bugfix: xddclistfile (reported by Loke_AF)
+  After "ADD" then xddclistfile was written too late.
+
+bugfix: md5sum (reported by Loke_AF)
+  Bot can crash when the current file is truncated.
+  versions affected: 3.28 - 3.29
+
+bugfix: CTCP SEARCH (reported by Dagger)
+  The ending code 0x01 was not removed from search.
+
+bugfix: logfile (reported by OmegaPhil)
+  Bot will crash if logfile is not writeable.
+  versions affected: 1.1 - 3.29
+
+bugfix: nomd5 (reported by [M]-V)
+  Announce stalled if nomd5 is set and nocrc32 is not set.
+  versions affected: 1.27 - 3.29
+
+bugfix: statefile (reported by Loke_AF)
+  When the filesystem id has changed, the bot updates the statefile on startup.
+
+bugfix: transferlimits (reported by Loke_AF)
+  Handle change of Daylight Saving Time corectly.
+
+410) FETCH queue
+  FETCH comands are now queued if max_uploads is reached.
+
+bugfix: FETCH
+  When resuming a file the full content was fetched.
+
+bugfix: FETCH
+  FETCH did not use the configured local_vhost.
+
+bugfix: max_uploads
+  max_uploads will now count all incoming transfers.
+
+409) FETCH AUTO.*
+  Get the filename and date from remote HTTP-server.
+  On completed download to the bot the file is renamed.
+
+bugfix: autoadd_time
+  Skip autoadd when packs_delayed is not empty.
+
+408) DCC STATUS (suggested by OmegaPhil)
+  Report idle queue in DCC STATUS reply.
+
+407) server_send_max
+  Restrict the size of the buffer the bot sends to the irc-server.
+  Otherwise the bot will be banned cause of excess flooding.
+  This setting is only per network.
+  Default: 600
+
+406) server_send_rate
+  Limit the median number of characters per second the bot sends
+  to the IRC server.
+  Otherwise the bot will be banned cause of excess flooding.
+  This setting is only per network.
+  Default: 25
+
+405) reminder_send_retry
+  Defines how often the bot retries to start the XDDC SEND to the user.
+  The default is 2 retries.
+
+extend debug and log information.
+
+With Version 3.29:
+------------------
+
+bugfix: XDCC SEND (reported by cheeseboy)
+  Sanitize filenames with quotes.
+
+bugfix: Configure -no-chroot (reported by Zlogene)
+  Build without nss library
+
+bugfix: upnp_router
+  Update for libminiupnpc 1.8
+
+bugfix: French translation
+  Updated by Sébastien Picavet
+
+404) XDCC OPTION
+
+  new user commands:
+  XDCC OPTION +IPV4          force IPv4 transfer
+  XDCC OPTION +IPV6          force IPv6 transfer
+  XDCC OPTION +ACTIVE        force active DCC mode
+  XDCC OPTION +PASSIVE       force passive DCC mode
+  XDCC OPTION +QUIET         set quietmode for transfer
+
+bugfix: channel -delay (reported by Loke_AF)
+  versions affected: 1.24 - 3.28
+  Do not add up delays of different channels.
+
+bugfix: status_time_dcc_chat (reported by Loke_AF)
+  versions affected: 3.28
+  Show value for SrvQ of current network.
+
+403) logrotate (suggested by Loke_AF)
+  logroate will now run exactly at the border of the time given.
+
+bugfix: tcprangestart (reported by HK)
+  versions affected: 3.0 - 3.28
+  On busy bots transfers could abort when tcprangestart was set.
+
+402) Export the packlist as json
+  htdocs/json.txt.rb: export packlist in json format.
+
+bugfix: conenctionmethod "bnc", "wingate", "custom"
+  versions affected: 3.12 - 3.28
+  Config was not accepted without extra parameters.
+
+401) XDCC BATCH (inspired by mflatischler)
+  Allow limiting patterns to segments and groups in BATCH.
+
+  new user commands:
+  XDCC BATCH <a>-<b>*<pattern>       Try to send or queue packs from <a> to <b> matching <pattern>
+  XDCC BATCH <g>*<pattern>           Try to send or queue packs from group <g> matching <pattern>
+
+400) BATCH
+  Allow limiting patterns to segments and groups in BATCH.
+
+  new admin commands:
+  BATCH <nick> <n>-<m>*<pattern> <net> Queues packs <n> to <m> matching <pattern> for <nick> in idle queue
+  BATCH <nick> <g>*<pattern> <net>     Queues pack with group <g> matching <pattern> for <nick> in idle queue
+
+399) CLEARRECORDS, CLEARGETS
+  changed admin commands:
+  CLEARRECORDS                       Clears transfer, bandwidth, uptime, and transfer limits.
+  CLEARGETS                          Clears download counters for each pack and total sent and uptime.
+
+bugfix: md5sum (found by Trellmor)
+  When running in background, somtimes md5 calculation could not be completed.
+
+bugfix: DUMP
+  Fix output of usenatip and channels.
+
+398) headline, channel -headline
+  You can now define mutiple headlines.
+
+Improve ruby_script method "info_pack" if called for the same pack.
+
+397) autoignore_rate
+  How strict should the auto-ignore be? autoignore_rate is the maximum
+  number of requests per second from a user.
+  Default: 8
+
+Short Term Features:
+   201 1/19/04 Open configurable to set how aggressive auto-ignore is
+
+396) flood_protection_rate (suggested by Loke_AF)
+  How strict should the bot activate its global flooding protection.
+  Value is the maximum number successful executed commands in the last
+  10 seconds.
+  Default: 6
+
+395) http_allow (suggested by Loke_AF)
+  Defines ip networks, which are allowed to access the the bot via telnet.
+  Multiple ip networks can be specified
+  Default: all.
+
+394) http_deny
+  Defines ip networks, that should not access the the bot via telnet.
+  Multiple ip networks can be specified
+  Default: none.
+
+bugfix: respondtochannelxdcc (reported by DoomyTheTrafficCone)
+  No longer respond to unsupported commands in channels.
+
+With Version 3.28:
+------------------
+
+bugfix: gnutls_protocol_set_priority deprecated
+  Now newer gnutls API 2.12.x is used.
+
+393) ruby_script (suggested by kenoki)
+  New method "on_upload_completed" called for each file uploaded by XDCC or FETCH.
+
+Configure -no-chroot (Sébastien Picavet)
+  Build without chroot() support
+
+bugfix: exit status (Sébastien Picavet)
+  Exit status in background is now 0 on success.
+
+bugfix: send_listfile (reported by Bachstelze)
+  Default was not set on REHASH.
+  XDCC LIST SEND was not disabled.
+
+392) admin_job_done_file (suggested by Loke_AF)
+  Write the output from the commands in "admin_job_file" into this file.
+  Default: <admin_job_file>.done
+
+391) REMOVELOST (suggested by Loke_AF, Sakura`Kinomoto)
+
+  new admin commands:
+  REMOVELOST                         Remove all lost packs
+  REMOVELOST <pattern>               Remove lost packs matching this pattern
+
+390) md5sum_exclude (suggested by Loke_AF)
+  configured, MD5 and CRC32 will be not computed for files matching
+  this patterns.
+
+389) SERVQ (suggested by Loke_AF)
+
+  new admin command:
+  SERVQ <net>                        Clears the server send queue
+
+bugfix: ONLINE, OFFLINE, HOP, LAG
+  Without argument not all networks where affected.
+
+bugfix: DELTRIGGER
+  Allow DELTRIGGER when CHTRIGGER is enabled.
+
+bugfix: expire_logfiles (reported by Loke_AF)
+  versions affected: 3.26 - 3.27
+  Bot could not delete expired files.
+
+-kqueue    Compile with kqueue() support
+
+bugfix: md5
+  Warn if the file gets truncated while hashing.
+
+bugfix: upnp_router
+  Update for libminiupnpc 1.6
+
+bugfix: http_port
+  Reduce load when sending data over HTTP.
+
+bugfix: max_upspeed (reported by Loke_AF)
+  The CPU load reached 100% when max_upspeed as limiting an upload.
+
+Configure -kqueue
+  Use kqueue to interfaces with the kernel for better performance.
+
+388) autoaddann_mask (suggested by Aashiqmunda)
+  When configured, addir, adnew and autoadd will only announce files
+  that do match this patterns.
+
+387) adddir_match (suggested by TheDeath)
+  When configured, addir, adnew and autoadd will skip all files that do
+  not match this patterns.
+
+386) CLEARRECORDS, CLEARGETS (suggested by Loke_AF)
+  Backup the statefile before clearing.
+
+385) ruby_script (suggested by CreeW)
+  New method "on_packlist", called if the pack list has changed.
+
+384) extend_status_line (suggested by Loke_AF)
+  Print SrvQ of current network.
+
+383) INFO, QUEUE, IQUEUE, SEND (suggested by Loke_AF)
+  Allow -1 for the xdcclistfile.
+
+bugfix: telnet_port
+  Logging was reporting only the first network name.
+
+382) Export for XDCC parser
+  htdocs/parser.txt.rb: export all packs in XDCC Parser notaion.
+
+bugfix: overallmaxspeed (reported by Loke_AF)
+  Fix distribution of load over mutiple transfers.
+
+bugfix: http_port (reported by sheppert)
+  versions affected: 3.23 - 3.27
+  In field 'slotsfree' of the weblist was the value of 'slotsused' displayed.
+
+With Version 3.27:
+------------------
+
+Configure TRANSLATION=
+  Extend the Makefile with custom translations
+
+382) REMOVEMATCH
+
+  new admin command:
+  REMOVEMATCH <pattern>              Remove every pack matching this pattern
+
+bugfix: Configure (reported by OmegaPhil)
+  Ensure detection of sendfile on Linux works with gcc46.
+
+bugfix: XDCC SEND
+  If user has already packs in the idlequeue, do not add new packs from him to the mainqueue.
+
+381) subdirs_delayed
+  When configured, addir, addnew, and autoadd will scan subdirs later.
+  This keeps the bot responsive if you have a huge directory tree.
+  Default: off, subdirectories are scanned immediately.
+
+bugfix: DUMP
+  Fix output of values with multiplier.
+
+380) server_connect_timeout (insprired by Thom)
+  Set the starting timeout in seconds on connect to the IRC-server.
+  This setting can only be set per network.
+  Default: 5
+
+379) DCLD (insprired by Aashiqmunda)
+  Show IP and country with DCLD.
+
+378) respondtochannellist, respondtochannelxdcc (inspired by CreeW)
+  This setting can be global or per network.
+
+377) periodicmsg (insprired by nanashiRei)
+  Setting now only per network. Multiple lines per net allowed.
+
+376) IQSEND (inspired by CreeW)
+
+  new admin commands:
+  IQSEND                             Push next entry from idle queue into main queue
+  IQSEND <id>                        Push given entry from idle queue into main queue
+
+bugfix: HOLDQUEUE
+  Show HOLDQUEUE in botinfo when active.
+
+375) OFFLINE, ONLINE (inspired by isengaurd)
+
+  new admin commands:
+  OFFLINE                            Close all networks
+  OFFLINE <net>                      Close given network
+  ONLINE                             Resume all networks
+  ONLINE <net>                       Resume given network
+
+374) announce_size (inspired by vice)
+  Print size of pack on announce.
+  Default: no
+
+bugfix: http_port
+  Force GMT to all Dates.
+
+373) http_dir
+  Support partial downloads and resume of files.
+  Count all files into maxspeed.
+
+bugfix: ignore_duplicate_ip
+  Remove user from queue too.
+
+372) statefile
+  Startup and shutdown of the bot is now much faster.
+
+371) tcp_nodelay, tcp_buffer_size (inspired by Aashiqmunda)
+  Better defaults for Windows/CYGWIN builds.
+
+extend debug and log information.
+
+bugfix: BATCH (reported by Aashiqmunda)
+  versions affected: 3.23 - 3.26
+  Bot did crash on admin command if the range was exeeding the last pack on the bot.
+
+370) delayed announce (inspired by TheDeath)
+  Delay announce till all files are added
+  and the checkums has been computed.
+  Wait if pack stays locked.
+
+bugfix: autosendpack (reported by Jikan)
+  Allow "autosendpack" with packnumber '-1'.
+
+369) RUBY
+
+  new admin commands:
+  RUBY <method> <args>               Call a method in the ruby_script with parameters <args>
+  RUBY <method>                      Call a method in the ruby_script with no parameters
+
+bugfix: REHASH (reported by CreeW)
+  versions affected: 3.0 - 3.26
+  Bot crashed when no global "user_nick" was defined.
+
+368) XDCC SEND (inspired by TheDeath)
+  Tell user to use "XDCC REMOVE <number>".
+
+367) PRINT, ruby_script
+  New variables for irconfig() "disk_space", "disk_space_text", "packsum",
+  "idlequeueused", "mainqueueused", "slotsfree", "slotsused",
+  "transfereddaily", "transferedweekly", "transferedmonthly",
+  "transferedtotal", "transferedtotalbytes", "uptime", "totaluptime",
+  "bandmax", "banduse"
+  New variable "mynick"
+
+366) http_port
+  Use short urls in weblist.
+
+bugfix: mime_type
+  versions affected: 3.0 - 3.26
+  Extra mime_type definitions where only used once.
+
+
